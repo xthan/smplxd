@@ -23,6 +23,7 @@ from .body_models import (
     FLAME,
     build_layer,
     SMPLLayer,
+    FastSMPLLayer,
     SMPLHLayer,
     SMPLXLayer,
     MANOLayer,

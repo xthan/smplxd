@@ -494,8 +494,113 @@ class SMPLLayer(SMPL):
                             full_pose=full_pose if return_full_pose else None)
 
         return output
+    
+class FastSMPLLayer(SMPL):
+    def __init__(
+        self,
+        *args,
+        **kwargs
+    ) -> None:
+        # Just create a SMPL module without any member variables
+        super(FastSMPLLayer, self).__init__(
+            create_body_pose=False,
+            create_betas=False,
+            create_global_orient=False,
+            create_transl=False,
+            *args,
+            **kwargs,
+        )
 
+    def forward(
+        self,
+        betas: Optional[Tensor] = None,
+        body_pose: Optional[Tensor] = None,
+        global_orient: Optional[Tensor] = None,
+        transl: Optional[Tensor] = None,
+        return_verts=True,
+        return_full_pose: bool = False,
+        pose2rot: bool = True,
+        **kwargs
+    ) -> SMPLOutput:
+        ''' Forward pass for the SMPL model
 
+            Parameters
+            ----------
+            global_orient: torch.tensor, optional, shape Bx3x3
+                Global rotation of the body.  Useful if someone wishes to
+                predicts this with an external model. It is expected to be in
+                rotation matrix format.  (default=None)
+            betas: torch.tensor, optional, shape BxN_b
+                Shape parameters. For example, it can used if shape parameters
+                `betas` are predicted from some external model.
+                (default=None)
+            body_pose: torch.tensor, optional, shape BxJx3x3
+                Body pose. For example, it can used if someone predicts the
+                pose of the body joints are predicted from some external model.
+                It should be a tensor that contains joint rotations in
+                rotation matrix format. (default=None)
+            transl: torch.tensor, optional, shape Bx3
+                Translation vector of the body.
+                For example, it can used if the translation
+                `transl` is predicted from some external model.
+                (default=None)
+            return_verts: bool, optional
+                Return the vertices. (default=True)
+            return_full_pose: bool, optional
+                Returns the full axis-angle pose vector (default=False)
+
+            Returns
+            -------
+        '''
+        model_vars = [betas, global_orient, body_pose, transl]
+        batch_size = 1
+        for var in model_vars:
+            if var is None:
+                continue
+            batch_size = max(batch_size, len(var))
+        device, dtype = self.shapedirs.device, self.shapedirs.dtype
+        if global_orient is None:
+            global_orient = torch.eye(3, device=device, dtype=dtype).view(
+                1, 1, 3, 3).expand(batch_size, -1, -1, -1).contiguous()
+        if body_pose is None:
+            body_pose = torch.eye(3, device=device, dtype=dtype).view(
+                1, 1, 3, 3).expand(
+                    batch_size, self.NUM_BODY_JOINTS, -1, -1).contiguous()
+        if betas is None:
+            betas = torch.zeros([batch_size, self.num_betas],
+                                dtype=dtype, device=device)
+        if transl is None:
+            transl = torch.zeros([batch_size, 3], dtype=dtype, device=device)
+        full_pose = torch.cat(
+            [global_orient.reshape(-1, 1, 3, 3),
+             body_pose.reshape(-1, self.NUM_BODY_JOINTS, 3, 3)],
+            dim=1)
+
+        vertices, joints = lbs(betas, full_pose, self.v_template,
+                               self.shapedirs, self.posedirs,
+                               self.J_regressor, self.parents,
+                               self.lbs_weights,
+                               pose2rot=False)
+
+        joints = self.vertex_joint_selector(vertices, joints)
+        # Map the joints to the current dataset
+        if self.joint_mapper is not None:
+            joints = self.joint_mapper(joints)
+
+        if transl is not None:
+            joints += transl.unsqueeze(dim=1)
+            vertices += transl.unsqueeze(dim=1)
+
+        output = SMPLOutput(vertices=vertices if return_verts else None,
+                            global_orient=global_orient,
+                            body_pose=body_pose,
+                            joints=joints,
+                            betas=betas,
+                            full_pose=full_pose if return_full_pose else None)
+
+        return output
+
+    
 class SMPLH(SMPL):
 
     # The hand joints are replaced by MANO
@@ -2281,7 +2386,7 @@ def build_layer(
     model_path: str,
     model_type: str = 'smpl',
     **kwargs
-) -> Union[SMPLLayer, SMPLHLayer, SMPLXLayer, MANOLayer, FLAMELayer]:
+) -> Union[SMPLLayer, FastSMPLLayer, SMPLHLayer, SMPLXLayer, MANOLayer, FLAMELayer]:
     ''' Method for creating a model from a path and a model type
 
         Parameters
@@ -2333,6 +2438,8 @@ def build_layer(
 
     if model_type.lower() == 'smpl':
         return SMPLLayer(model_path, **kwargs)
+    elif model_type.lower() == 'fastsmpl':
+        return FastSMPLHLayer(model_path, **kwargs)
     elif model_type.lower() == 'smplh':
         return SMPLHLayer(model_path, **kwargs)
     elif model_type.lower() == 'smplx':

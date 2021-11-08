@@ -1,3 +1,5 @@
+## Modified SMPL-x code for real-time human pose fitting
+
 ## SMPL-X:  A new joint 3D model of the human body, face and hands together
 
 [[Paper Page](https://smpl-x.is.tue.mpg.de)] [[Paper](https://ps.is.tuebingen.mpg.de/uploads_file/attachment/attachment/497/SMPL-X.pdf)]
