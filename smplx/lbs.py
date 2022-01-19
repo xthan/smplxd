@@ -159,6 +159,7 @@ def lbs(
     parents: Tensor,
     lbs_weights: Tensor,
     pose2rot: bool = True,
+    detail: Tensor = None,
 ) -> Tuple[Tensor, Tensor]:
     ''' Performs Linear Blend Skinning with the given shape and pose parameters
 
@@ -187,6 +188,8 @@ def lbs(
             matrices. The default value is True. If False, then the pose tensor
             should already contain rotation matrices and have a size of
             Bx(J + 1)x9
+        detail torch.tensor BxVx3 
+            Per vertex offset added to the template mesh that will be deformed
         dtype: torch.dtype, optional
 
         Returns
@@ -203,6 +206,9 @@ def lbs(
 
     # Add shape contribution
     v_shaped = v_template + blend_shapes(betas, shapedirs)
+    # Add per vertex offset
+    if detail is not None:
+        v_shaped = v_shaped + detail
 
     # Get the joints
     # NxJx3 array

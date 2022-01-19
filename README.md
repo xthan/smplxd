@@ -1,4 +1,5 @@
-## Modified SMPL-x code for real-time human pose fitting
+## Added SMPL+D (SMPL with per vertex displacement) in SMPLX. The displacement can be passed to SMPL forward with the ```detail``` argument.
+
 
 ## SMPL-X:  A new joint 3D model of the human body, face and hands together
 

@@ -48,7 +48,7 @@ class SMPL(nn.Module):
 
     def __init__(
         self, model_path: str,
-	kid_template_path: str = '',
+        kid_template_path: str = '',
         data_struct: Optional[Struct] = None,
         create_betas: bool = True,
         betas: Optional[Tensor] = None,
@@ -312,6 +312,7 @@ class SMPL(nn.Module):
         return_verts=True,
         return_full_pose: bool = False,
         pose2rot: bool = True,
+        detail: Optional[Tensor] = None,
         **kwargs
     ) -> SMPLOutput:
         ''' Forward pass for the SMPL model
@@ -342,7 +343,8 @@ class SMPL(nn.Module):
                 Return the vertices. (default=True)
             return_full_pose: bool, optional
                 Returns the full axis-angle pose vector (default=False)
-
+            detail:  torch.tensor, optional, shape BxNx3
+                Per vertex offset added to the template mesh
             Returns
             -------
         '''
@@ -369,7 +371,8 @@ class SMPL(nn.Module):
         vertices, joints = lbs(betas, full_pose, self.v_template,
                                self.shapedirs, self.posedirs,
                                self.J_regressor, self.parents,
-                               self.lbs_weights, pose2rot=pose2rot)
+                               self.lbs_weights, pose2rot=pose2rot,
+                               detail=detail)
 
         joints = self.vertex_joint_selector(vertices, joints)
         # Map the joints to the current dataset
