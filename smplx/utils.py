@@ -33,6 +33,7 @@ class ModelOutput:
     v_shaped: Optional[Tensor] = None
     detail: Optional[Tensor] = None   # per vertice displacement
     faces: Optional[Tensor] = None    # mesh faces
+    scale: Optional[Tensor] = None    # scale
 
     def __getitem__(self, key):
         return getattr(self, key)
