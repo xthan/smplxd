@@ -14,6 +14,7 @@
 # Cybernetics. All rights reserved.
 #
 # Contact: ps-license@tuebingen.mpg.de
+# Modified by Xintong Han, hixintonghan@gmail.com
 
 import io
 import os
@@ -21,13 +22,13 @@ import os
 from setuptools import setup
 
 # Package meta-data.
-NAME = 'smplx'
-DESCRIPTION = 'PyTorch module for loading the SMPLX body model'
-URL = 'http://smpl-x.is.tuebingen.mpg.de'
-EMAIL = 'vassilis.choutas@tuebingen.mpg.de'
-AUTHOR = 'Vassilis Choutas'
+NAME = 'smplxd'
+DESCRIPTION = 'PyTorch module for loading the SMPLX and SMPL+D body model'
+URL = 'https://github.com/xthan/smplxd'
+EMAIL = 'hixintonghan@gmail.com'
+AUTHOR = 'Xintong Han'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.1.28'
+VERSION = '0.1'
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -75,4 +76,4 @@ setup(name=NAME,
           'matplotlib': matplotlib_reqs,
           'all': pyrender_reqs + matplotlib_reqs + open3d_reqs
       },
-      packages=['smplx'])
+      packages=['smplxd'])

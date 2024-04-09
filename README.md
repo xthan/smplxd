@@ -1,12 +1,13 @@
-## Added SMPL+D (SMPL with per vertex displacement) in SMPLX. The displacement can be passed to SMPL forward with the ```detail``` argument.
-
-
 ## SMPL-X:  A new joint 3D model of the human body, face and hands together
 
 [[Paper Page](https://smpl-x.is.tue.mpg.de)] [[Paper](https://ps.is.tuebingen.mpg.de/uploads_file/attachment/attachment/497/SMPL-X.pdf)]
 [[Supp. Mat.](https://ps.is.tuebingen.mpg.de/uploads_file/attachment/attachment/498/SMPL-X-supp.pdf)]
 
 ![SMPL-X Examples](./images/teaser_fig.png)
+
+## Added SMPL+D (SMPL with per vertex displacement) in SMPLX. The displacement can be passed to SMPL forward with the ```detail``` argument.
+
+The code is modified to support scale, translation, and displacement for the SMPL model, which could be further used for downstream applications, e.g., register and animate a 3D scan [code](https://github.com/xthan/smplreg)
 
 ## Table of Contents
   * [License](#license)
@@ -47,7 +48,7 @@ SMPL-X is defined by a function M(θ, β, ψ), where θ is the pose parameters, 
 ψ the facial expression parameters.
 
 ## News
-
+- 9 Apr 2024: The code is modified to support scale, translation, and displacement for the SMPL model, which could be further used for downstream applications, e.g., register and animate a 3D scan [code](https://github.com/xthan/smplreg)
 - 3 November 2020: We release the code to transfer between the models in the
   SMPL family. For more details on the code, go to this [readme
   file](./transfer_model/README.md). A detailed explanation on how the mappings
@@ -61,11 +62,11 @@ SMPL-X is defined by a function M(θ, β, ψ), where θ is the pose parameters, 
 To install the model please follow the next steps in the specified order:
 1. To install from PyPi simply run: 
   ```Shell
-  pip install smplx[all]
+  pip install smplxd
   ```
 2. Clone this repository and install it using the *setup.py* script: 
 ```Shell
-git clone https://github.com/vchoutas/smplx
+git clone https://github.com/xthan/smplxd
 python setup.py install
 ```
 
@@ -208,3 +209,5 @@ The code of this repository was implemented by [Vassilis Choutas](vassilis.chout
 For questions, please contact [smplx@tue.mpg.de](smplx@tue.mpg.de).
 
 For commercial licensing (and all related questions for business applications), please contact [ps-licensing@tue.mpg.de](ps-licensing@tue.mpg.de).
+
+For questions regarding SMPLX/SMPL+D, please contact Xintong Han [hixintonghan@gmail.com](hixintonghan@gmail.com).
